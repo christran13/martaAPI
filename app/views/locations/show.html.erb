@@ -1,0 +1,62 @@
+<h3>You are currently standing at...</h3>
+
+<p>
+	<%= @location.my_location %>
+</p>
+
+<% if @bus_count == 0  %>
+	<p>
+		... ... ... Sorry friend, better order an Uber/Lyft or hitchhike. Or call a friend. Or just give up and go back inside and watch TV, save some money...
+	</p>
+<% end %>
+
+<% @nearby_buses.each_with_index do |bus, index| %>
+	<p>
+		<strong>Route</strong>: <%= bus["ROUTE"] %> <br>
+		<strong>Vehicle</strong>: <%= bus["VEHICLE"] %> <br>
+		<strong>Next Stop</strong>: <%= bus["TIMEPOINT"] %> <br>
+	</p>
+
+<script>
+	function initialize() {
+		var myLatLng = new google.maps.LatLng(<%= @location.latitude %>, <%= @location.longitude %>);
+		var busLatLng = new google.maps.LatLng(<%= bus["LATITUDE"] %>, <%= bus["LONGITUDE"] %>);
+
+		var mapOptions ={
+			center: myLatLng,
+			zoom: 13
+		}
+
+		var map = new google.maps.Map(document.getElementById('map-canvas<%= index %>'), mapOptions);
+
+		var marker = new google.maps.Marker({
+			position: busLatLng,
+			map: map,
+			animation: google.maps.Animation.DROP
+		});
+
+		var image = "https://www.google.com/mapfiles/marker_green.png"
+
+		var marker2 = new google.maps.Marker({
+			position: myLatLng,
+			map: map,
+			icon: image,
+			animation: google.maps.Animation.DROP
+		});
+
+		google.maps.event.addListener(marker, marker2);
+
+	}
+
+	google.maps.event.addDomListener(window, 'load', initialize);
+
+</script>
+
+<div id="map-canvas<%= index %>" style="height: 200px; width: 200px">
+	
+</div>
+
+<% end %>
+
+<%= link_to "Actually, I'm at...", edit_location_path(@location) %>
+
